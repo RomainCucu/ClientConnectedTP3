@@ -11,8 +11,7 @@ var server = net.createServer(function (socket){
   socket.write('hello\r\n');
   socket.pipe(socket); 
 
-	  socket.on('data',function(chunk){
-	  	console.log('ici');
+	  socket.on('data',function(chunk){	  	
 	  	console.log(""+chunk);
 	  });
 

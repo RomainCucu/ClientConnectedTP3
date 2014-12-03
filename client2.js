@@ -29,11 +29,11 @@ var client = net.connect({port: 1337}, function () {
               });
               fileStream.on('end',function(chunk){
                 console.log('bite from '+i+' to '+(i+99)+' sent');
-              });
-              if(i<result){                
-                i+=100;
-                setTimeout(sendData(),1000);
-              }else return;
+                if(i<result){                
+                  i+=100;
+                  setTimeout(sendData(),1000);
+                }else return;
+              });              
             }           
           }//if stats.size        
       });//fs.stat
