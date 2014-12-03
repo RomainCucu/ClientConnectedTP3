@@ -33,7 +33,7 @@ var client = net.connect({port: 1337}, function () {
                   i+=100;
                   setTimeout(sendData,100);
                 }else if(i-(result-100)<=rest){
-                  console.log('bite from '+i+' to '+(i+99)+' sent');
+                  console.log('bite from '+i+' to '+(i++)+' sent');
                   i++;
                   setTimeout(sendData,100);
                 }
