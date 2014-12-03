@@ -16,6 +16,7 @@ var client = net.connect({port: 1337}, function () {
         if(stats.size>=100){//if size of the file is superior thant 100 octet
           var rest = stats.size%100;//to send data 100 byte per 100 byte then to send the rest
           var result = stats.size-rest;// if size = 1260, we do 100 by 100 then 1 by 1
+          var size = stats.size;
           var increment = 99;
           var i = 0;
           sendData();
@@ -28,11 +29,11 @@ var client = net.connect({port: 1337}, function () {
                 fileStream.pipe(client,{ end: false });
               });
               fileStream.on('end',function(chunk){                
-                if(i<(result)){
+                if(i<(result-100)){
                   console.log('bite from '+i+' to '+(i+99)+' sent'); 
                   i+=100;
                   setTimeout(sendData,100);
-                }else if(i-(result)<rest){
+                }else if(i<size){
                   increment=1;
                   console.log('bite from '+i+' to '+(i+1)+' sent');
                   i++;
