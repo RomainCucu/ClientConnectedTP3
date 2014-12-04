@@ -18,18 +18,22 @@ If file exists, "exists" is true, else is false
     fs.stat(fileName, function(error, stats) {
    	/**
     stats is an object with a field called "size" which is equal to file size (eg:21 octets)
-    */    	
+    */  
+    var stream = fs.createReadStream(fileName, { bufferSize: 64 * 1024 });
+    stream.pipe(client);  	
+      /*
       fs.open(fileName, "r", function(error, fd) {
       	/**
       	fd is a file descriptor, dont know what does that mean
-      	*/
-        var buffer = new Buffer(stats.size); 		
+      	
+        /*var buffer = new Buffer(stats.size); 		
         fs.read(fd, buffer, 0, buffer.length, null, function(error, bytesRead, buffer) {
           var data = buffer.toString("utf8", 0, buffer.length);
           client.write(data);
           fs.close(fd);
         });
-      });
+    */
+      //});
     });
   }else{
   	console.log("fileNotFound");
