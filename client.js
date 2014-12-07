@@ -18,9 +18,12 @@ If file exists, "exists" is true, else is false
     fs.stat(fileName, function(error, stats) {
    	/**
     stats is an object with a field called "size" which is equal to file size (eg:21 octets)
-    */  
-      var stream = fs.createReadStream(fileName, { bufferSize: 64 * 1024 });
-      stream.pipe(client);
+    */
+      transfer_object = {};
+      transfer_object.fileName = fileName;
+      transfer_object.size = stats.size;      
+      transfer_object.stream = fs.createReadStream(fileName, { bufferSize: 64 * 1024 });
+      client.write("upload_demand");
     });
   }else{
   	console.log("fileNotFound");
@@ -29,7 +32,21 @@ If file exists, "exists" is true, else is false
 });
 
 client.on('data', function(data) {
-  console.log(''+data);
+  if(data=="upload_demand_ok"){
+    console.log(''+data);
+    client.write("fileName"+transfer_object.fileName);
+  }
+  else if(data == "fileName_ok"){
+    console.log(''+data);
+    client.write("size"+transfer_object.size)
+  }
+  else if(data == "size_ok"){
+    console.log(''+data);
+    transfer_object.stream.pipe(client,{ end: false });
+  }else if(data.toString().indexOf("uploading")>-1){
+    data = parseInt(data.toString().replace("uploading",""));
+   if(data>=100) client.write('upload_success');
+  }
 });
 /**
 client receive end event from server

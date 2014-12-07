@@ -3,26 +3,45 @@ var util = require("util");
 var fs = require('fs');
 var clients = [];
 var i = 0;
-var fileName = "exemple.txt";
+var receive_object = {};
+receive_object.contenu = "";
 var server = net.createServer(function (socket){	
 
   console.log('server connected');
 
   socket.write('hello\r\n');
+
   //socket.pipe(socket);     
-    var b = "";
-	  socket.on('data',function(chunk){	  	
-	  	console.log(""+chunk);
-      b += chunk;
+    
+	  socket.on('data',function(data){	            
+	  	if(data.toString() == "upload_demand"){
+        socket.write("upload_demand_ok");
+      }else if(data.toString().indexOf("fileName")>-1){
+        data = data.toString().replace("fileName","");
+        receive_object.fileName = data;
+        socket.write("fileName_ok");
+      }else if(data.toString().indexOf("size")>-1){
+        data = data.toString().replace("size","");
+        receive_object.size_total = data;        
+        receive_object.size_received = 0;
+        socket.write("size_ok");
+      }else if(data.toString()=="upload_success"){        
+        fs.writeFile("server_"+receive_object.fileName, receive_object.contenu, function (err) {
+          if (err) throw err;
+          console.log('It\'s saved!');
+        });//write
+      }
+      else{
+        receive_object.size_received += 64*1024;
+        socket.write("uploading"+parseInt(receive_object.size_received/receive_object.size_total*100));
+        receive_object.contenu += data;
+      }
+      
 	  });
 
     socket.on('end', function() {
     	console.log('client disconnected');
-      console.log("saved");
-      fs.writeFile('message.txt', b, function (err) {
-        if (err) throw err;
-        console.log('It\'s saved!');
-      });//write
+      
   });//socket on
 });
 /**
