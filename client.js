@@ -7,28 +7,20 @@ var fileName = "exemple.txt";
 client connecting to the corresponding port Server
 */
 var client = net.connect({port: 1337}, function () {
-	util.log("Client connected");
-
-
-fs.exists(fileName, function(exists) {
-/**
-If file exists, "exists" is true, else is false
-*/
-  if (exists) {  	
-    fs.stat(fileName, function(error, stats) {
-   	/**
-    stats is an object with a field called "size" which is equal to file size (eg:21 octets)
-    */
-      transfer_object = {};
-      transfer_object.fileName = fileName;
-      transfer_object.size = stats.size;      
-      transfer_object.stream = fs.createReadStream(fileName, { bufferSize: 64 * 1024 });
-      client.write("upload_demand");
-    });
-  }else{
-  	console.log("fileNotFound");
-  }
-});
+  util.log("Client connected");
+  fs.exists(fileName, function(exists) {
+    if (exists) {  	
+      fs.stat(fileName, function(error, stats) {
+        transfer_object = {};
+        transfer_object.fileName = fileName;
+        transfer_object.size = stats.size;      
+        transfer_object.stream = fs.createReadStream(fileName, { bufferSize: 64 * 1024 });
+        client.write("upload_demand");
+      });
+    }else{
+    	console.log("fileNotFound");
+    }
+  });
 });
 
 client.on('data', function(data) {
